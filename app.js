@@ -3,7 +3,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const date = require(__dirname + "/date.js");
+// const date = require(__dirname + "/date.js");
 
 const app = express();
 
@@ -32,10 +32,27 @@ const item3 = new Item({
   name: "<-- Hit this to delete an item."
 });
 
+const defaultItems = [item1, item2, item3];
+
+
+
 app.get("/", function(req, res) {
 
+  Item.find({}, function(err, foundItems){
 
-  res.render("list", {listTitle: "Today", newListItems: items});
+    if (foundItems.length === 0) {
+      Item.insertMany(defaultItems, function(err){
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("Successfully saved default items");
+        }
+      });
+      res.redirect("/");
+    } else {
+      res.render("list", {listTitle: "Today", newListItems: foundItems});
+    }
+  });
 
 });
 
